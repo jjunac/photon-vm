@@ -7,7 +7,7 @@ namespace strix {
 namespace executor {
 
 
-void Executor::execute(const parser::Expression& iExpr) {
+void Executor::execute(const common::Expression& iExpr) {
     Return aReturn = _commandFactory.getCommand(iExpr.command).run(iExpr.arguments);
     if (aReturn.isEnd) {
         exit(aReturn.exitCode);

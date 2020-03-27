@@ -3,6 +3,7 @@
 #include <vector>
 #include <string>
 
+#include "strix/common/argument.hpp"
 #include "strix/executor/return.hpp"
 
 namespace strix {
@@ -15,7 +16,7 @@ public:
     BaseCommand() = default;
     virtual ~BaseCommand() = default;
 
-    virtual Return run(const std::vector<std::string>& iArguments) const = 0;
+    virtual Return run(const std::vector<common::Argument>& iArguments) const = 0;
 
 };
 

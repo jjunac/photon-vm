@@ -4,22 +4,36 @@
 namespace strix {
 namespace parser {
 
+using common::Expression;
+
+Parser::Parser() :
+        _expressions(),
+        _state(),
+        _currentString(),
+        _lineno(1),
+        _columnno()
+{}
 
 Expression& Parser::parseLine(const std::string& iLine) {
     Expression anExpr;
 
     _state = State::kStart;
+    _columnno = 1;
     for (char c : iLine) {
         if ((_state = parseChar(c, anExpr)) == State::kEnd) {
             break;
         }
+        ++_columnno;
     }
     endLine(anExpr);
-    // TODO: check if state != end ?
-
     _expressions.push_back(anExpr);
+    // TODO: check if state != end ?
+    ++_lineno;
     return _expressions.back();
 }
+
+#define UNEXPECTED_TOKEN(Token) \
+    throw ParserException(std::string("Unexpected '") + Token + "' at line " + std::to_string(_lineno)+ " column " + std::to_string(_columnno))
 
 Parser::State Parser::parseChar(char iCh, Expression& iExpr) {
     switch (_state) {
@@ -28,15 +42,15 @@ Parser::State Parser::parseChar(char iCh, Expression& iExpr) {
         if (iCh == ' ') {
             return State::kStart;
         }
-        _currentToken = iCh;
+        _currentString = iCh;
         return State::kCommand;
 
     case State::kCommand:
         if (iCh == ' ') {
-            iExpr.command = std::move(_currentToken);
+            iExpr.command = std::move(_currentString);
             return State::kBeforeArgument;
         }
-        _currentToken += iCh;
+        _currentString += iCh;
         return State::kCommand;
 
     case State::kBeforeArgument:
@@ -44,42 +58,71 @@ Parser::State Parser::parseChar(char iCh, Expression& iExpr) {
             return State::kBeforeArgument;
         }
         if (iCh == '"') {
-            _currentToken.clear();
+            _currentString.clear();
             return State::kString;
         }
-        // TODO: not taken into account
-        return State::kEnd;
+        if ('0' <= iCh && iCh <= '9') {
+            _currentString.clear();
+            _currentString = iCh;
+            return State::kLong;
+        }
+        UNEXPECTED_TOKEN(iCh);
 
     case State::kString:
         if (iCh == '"') {
-            iExpr.arguments.push_back(std::move(_currentToken));
+            iExpr.arguments.emplace_back(std::move(_currentString));
             return State::kAfterArgument;
         }
         if (iCh == '\\') {
             return State::kStringWithBackslash;
         }
-        _currentToken += iCh;
+        _currentString += iCh;
         return State::kString;
+    
+    case State::kLong:
+        if ('0' <= iCh && iCh <= '9') {
+            _currentString += iCh;
+            return State::kLong;
+        }
+        if (iCh == '.') {
+            _currentString += iCh;
+            return State::kDouble;
+        }
+        if (iCh == ' ') {
+            iExpr.arguments.emplace_back(std::stol(_currentString));
+            return State::kAfterArgument;
+        }
+        UNEXPECTED_TOKEN(iCh);
+    
+    case State::kDouble:
+        if ('0' <= iCh && iCh <= '9') {
+            _currentString += iCh;
+            return State::kDouble;
+        }
+        if (iCh == ' ') {
+            iExpr.arguments.emplace_back(std::stod(_currentString));
+            return State::kAfterArgument;
+        }
+        UNEXPECTED_TOKEN(iCh);
 
     case State::kStringWithBackslash:
         if (iCh == '\\') {
-            _currentToken += '\\';
+            _currentString += '\\';
             return State::kString;
         }
         if (iCh == 'n') {
-            _currentToken += '\n';
+            _currentString += '\n';
             return State::kString;
         }
         if (iCh == 't') {
-            _currentToken += '\t';
+            _currentString += '\t';
             return State::kString;
         }
         if (iCh == '"') {
-            _currentToken += '"';
+            _currentString += '"';
             return State::kString;
         }
-        // TODO: not taken into account
-        return State::kEnd;
+        UNEXPECTED_TOKEN(iCh);
 
     case State::kAfterArgument:
         if (iCh == ' ') {
@@ -88,12 +131,11 @@ Parser::State Parser::parseChar(char iCh, Expression& iExpr) {
         if (iCh == ',') {
             return State::kBeforeArgument;
         }
-        // TODO: not taken into account
-        return State::kEnd;
+        UNEXPECTED_TOKEN(iCh);
 
     case State::kEnd:
     default:
-        return State::kEnd;
+        UNEXPECTED_TOKEN(iCh);
     }
 }
 
@@ -101,16 +143,25 @@ void Parser::endLine(Expression& iExpr) {
     switch (_state) {
 
     case State::kCommand:
-        iExpr.command = std::move(_currentToken);
+        iExpr.command = std::move(_currentString);
         return;
 
-    case State::kStart:
+    case State::kLong:
+        iExpr.arguments.emplace_back(std::stol(_currentString));
+        return;
+
+    case State::kDouble:
+        iExpr.arguments.emplace_back(std::stod(_currentString));
+        return;
+
     case State::kBeforeArgument:
     case State::kString:
     case State::kStringWithBackslash:
+        UNEXPECTED_TOKEN("EOF");
+
+    case State::kStart:
     case State::kAfterArgument:
     case State::kEnd:
-        // TODO: throw something
         return;
     }
 }

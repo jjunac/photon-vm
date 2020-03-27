@@ -7,7 +7,7 @@ namespace executor {
 namespace command {
 
 
-Return EndCommand::run(const std::vector<std::string>& /* iArguments */) const {
+Return EndCommand::run(const std::vector<common::Argument>& /* iArguments */) const {
     return {true};
 }
 

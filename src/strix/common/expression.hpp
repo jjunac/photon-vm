@@ -3,17 +3,20 @@
 #include <vector>
 #include <string>
 
+#include "strix/common/argument.hpp"
+
 namespace strix {
-namespace parser {
+namespace common {
 
 
 struct Expression {
     std::string command;
-    std::vector<std::string> arguments;
+    std::vector<Argument> arguments;
 
     Expression() = default;
 };
 
-} // namespace parser
+
+} // namespace common
 } // namespace strix
 

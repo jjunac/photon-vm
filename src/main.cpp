@@ -13,19 +13,22 @@ int main(int argc, char const *argv[]) {
     std::string line;
     std::ifstream myfile (argv[1]);
     if (!myfile.is_open()) {
-        std::cout << "Unable to open file" << std::endl; 
+        std::cerr << "Unable to open file" << std::endl;
         return 1;
     }
 
-    strix::parser::Parser aParser;
-    while (getline(myfile, line)) {
-        // std::cout << line << std::endl;
-        aParser.parseLine(line);
-    }
-    myfile.close();
+    try {
+        strix::parser::Parser aParser;
+        while (getline(myfile, line)) {
+            aParser.parseLine(line);
+        }
+        myfile.close();
 
-    strix::executor::Executor anExecutor;
-    anExecutor.execute(aParser);
+        strix::executor::Executor anExecutor;
+        anExecutor.execute(aParser);
+    } catch (std::exception& e) {
+        std::cerr << e.what() << std::endl;
+    }
 
     return 0;
 }
