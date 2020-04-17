@@ -16,7 +16,8 @@ public:
     EndCommand() = default;
     virtual ~EndCommand() = default;
 
-    Return run(const std::vector<common::Argument>& iArguments) const override;
+    bool isValid(const std::vector<common::Argument>& iArguments) const override;
+    Return run(ExecutionContext& ioExecutionContext, const std::vector<common::Argument>& iArguments) const override;
 
 };
 

@@ -8,13 +8,13 @@ namespace executor {
 
 
 void Executor::execute(const common::Expression& iExpr) {
-    Return aReturn = _commandFactory.getCommand(iExpr.command).run(iExpr.arguments);
+    Return aReturn = _commandFactory.getCommand(iExpr.command).run(_executionContext, iExpr.arguments);
     if (aReturn.isEnd) {
         exit(aReturn.exitCode);
     }
 }
 
-void Executor::execute(const parser::Parser& iParser) {
+void Executor::execute(const parser::StrixParser& iParser) {
     for (auto &&anExpr : iParser.getExpressions()) {
         execute(anExpr);
     }

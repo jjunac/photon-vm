@@ -5,6 +5,7 @@
 
 #include "strix/common/argument.hpp"
 #include "strix/executor/return.hpp"
+#include "strix/executor/execution_context.hpp"
 
 namespace strix {
 namespace executor {
@@ -16,7 +17,8 @@ public:
     BaseCommand() = default;
     virtual ~BaseCommand() = default;
 
-    virtual Return run(const std::vector<common::Argument>& iArguments) const = 0;
+    virtual bool isValid(const std::vector<common::Argument>& iArguments) const = 0;
+    virtual Return run(ExecutionContext& ioExecutionContext, const std::vector<common::Argument>& iArguments) const = 0;
 
 };
 

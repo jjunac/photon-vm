@@ -3,26 +3,21 @@
 #include <iostream>
 #include <string>
 
+#include "strix/common/type.hpp"
+
 namespace strix {
 namespace executor {
 namespace command {
 
+bool PrintCommand::isValid(const std::vector<common::Argument>& iArguments) const {
+    return iArguments.size() == 1;
+}
 
-Return PrintCommand::run(const std::vector<common::Argument>& iArguments) const {
-    using common::Argument;
+Return PrintCommand::run(ExecutionContext& ioExecutionContext, const std::vector<common::Argument>& iArguments) const {
+    using common::Type;
 
-    const auto& anArgument = iArguments[0];
-    switch(anArgument.getType()) {
-    case Argument::Type::LONG:
-        std::cout << std::to_string(anArgument.getLong());
-        break;
-    case Argument::Type::DOUBLE:
-        std::cout << std::to_string(anArgument.getDouble());
-        break;
-    case Argument::Type::STRING:
-        std::cout << anArgument.getString();
-        break;
-    }
+    const common::Argument& anArgument = iArguments[0];
+    std::cout << ioExecutionContext.evaluate<std::string>(anArgument);
 
     return {};
 }

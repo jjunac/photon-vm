@@ -6,8 +6,11 @@ namespace strix {
 namespace executor {
 namespace command {
 
+bool EndCommand::isValid(const std::vector<common::Argument>& iArguments) const {
+    return iArguments.empty();
+}
 
-Return EndCommand::run(const std::vector<common::Argument>& /* iArguments */) const {
+Return EndCommand::run(ExecutionContext& /* ioExecutionContext */, const std::vector<common::Argument>& /* iArguments */) const {
     return {true};
 }
 

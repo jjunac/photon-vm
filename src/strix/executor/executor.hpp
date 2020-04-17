@@ -4,7 +4,9 @@
 
 #include "strix/common/expression.hpp"
 #include "strix/executor/command_factory.hpp"
-#include "strix/parser/parser.hpp"
+#include "strix/executor/execution_context.hpp"
+#include "strix/parser/strix_parser.hpp"
+
 
 namespace strix {
 namespace executor {
@@ -16,10 +18,11 @@ public:
     ~Executor() = default;
 
     void execute(const common::Expression& iExpression);
-    void execute(const parser::Parser& iParser);
+    void execute(const parser::StrixParser& iParser);
 
 private:
     CommandFactory _commandFactory;
+    ExecutionContext _executionContext;
 };
 
 

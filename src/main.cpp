@@ -3,7 +3,7 @@
 #include <string>
 
 #include "strix/executor/executor.hpp"
-#include "strix/parser/parser.hpp"
+#include "strix/parser/strix_parser.hpp"
 
 int main(int argc, char const *argv[]) {
     if (argc != 2) {
@@ -11,14 +11,15 @@ int main(int argc, char const *argv[]) {
         return 1;
     }
     std::string line;
-    std::ifstream myfile (argv[1]);
+    std::string filename = argv[1];
+    std::ifstream myfile {argv[1]};
     if (!myfile.is_open()) {
         std::cerr << "Unable to open file" << std::endl;
         return 1;
     }
 
     try {
-        strix::parser::Parser aParser;
+        strix::parser::StrixParser aParser;
         while (getline(myfile, line)) {
             aParser.parseLine(line);
         }

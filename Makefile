@@ -9,7 +9,7 @@ CXX := g++
 
 # Parallelism
 CPUS ?= $(shell nproc)
-MAKEFLAGS += --jobs=$(CPUS)
+MAKEFLAGS += -j$(CPUS)
 
 # Project structures
 SRCDIR := src
@@ -50,14 +50,17 @@ TEST_OBJECTS := $(filter-out $(BUILDDIR)/$(MAIN).o, $(OBJECTS)) $(TEST_OBJECTS)
 
 INCLUDES := \
 	-I $(SRCDIR)
-TEST_INCLUDES := \
-	$(INCLUDES) \
-	-I external/googletest/googletest/include
+TEST_INCLUDES := 								\
+	$(INCLUDES) 								\
+	-I external/googletest/googletest/include 	\
+	-I external/googletest/googlemock/include
 
 # Extra flags to give to the C compiler. 
 CFLAGS := -std=c99 -Wall -Wextra -Werror -pedantic -g
 # Extra flags to give to the C++ compiler. 
 CXXFLAGS := -std=c++17 -Wall -Wextra -Werror -pedantic -g -DBOOST_LOG_DYN_LINK
+# Thanks google test ! (cf. https://github.com/google/googletest/issues/2650)
+CXXFLAGS_TEST := -std=c++17 -g -DBOOST_LOG_DYN_LINK
 # Extra flags to give to compilers when they are supposed to invoke the linker, ‘ld’, such as -L. 
 # Libraries (-lfoo) should be added to the LDLIBS variable instead. 
 LDFLAGS := -Llib
@@ -108,12 +111,12 @@ build-test: external $(TEST_TARGET)
 
 $(TEST_TARGET): $(TEST_OBJECTS)
 	@echo -e "    \e[93m[artefact]\e[0m $@"
-	@$(CXX) $(LDFLAGS) $^ -o $@ $(LDLIBS) -lgtest
+	@$(CXX) $(LDFLAGS) $^ -o $@ $(LDLIBS) -lgtest -lgtest_main -lgmock
 
 $(BUILDDIR)/%.o: $(TESTDIR)/%.cpp
 	@mkdir -p $(@D)
 	@echo -e "    \e[96m[object]\e[0m $@"
-	@$(CXX) $(CXXFLAGS) $(TEST_INCLUDES) -c -o $@ $<
+	@$(CXX) $(CXXFLAGS_TEST) $(TEST_INCLUDES) -c -o $@ $<
 
 .PHONY: test
 test: build-test

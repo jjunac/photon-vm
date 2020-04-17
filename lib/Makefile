@@ -1,27 +1,17 @@
 
+all: libgtest.a libgtest_main.a libgmock.a
 
-EXTERNAL_TARGETS := \
-	../external/googletest/googletest/make/gtest_main.a
-
-EXTERNAL_DIRS := $(foreach ext,$(EXTERNAL_TARGETS), $(dir $(ext)))
-
-.PHONY: $(EXTERNAL_TARGETS)
-
-
-all: libgtest.a
-
-$(EXTERNAL_TARGETS):
-	@echo -e "    \e[93m[artefact]\e[0m $@"
-	@$(MAKE) -s --no-print-directory  -C $(dir $@)
-
-libgtest.a: ../external/googletest/googletest/make/gtest_main.a
+libgtest.a:
+	@cmake ../external/googletest/
+	@$(MAKE) -s --no-print-directory  -C ../external/googletest/
 	@echo -e "    \e[92m[library]\e[0m $@"
-	@ln -sf $< $@
+	@ln -sf ../external/googletest/lib/libgtest.a $@
 
-clean:
-	@echo "Cleaning library..."; 
-	@$(RM) *.a
-	@echo "Cleaning external..."; 
-	@for dir in $(EXTERNAL_DIRS); do 	\
-		$(MAKE) -s --no-print-directory  -C $$dir clean;			\
-	done
+libgtest_main.a: libgtest.a
+	@echo -e "    \e[92m[library]\e[0m $@"
+	@ln -sf ../external/googletest/lib/libgtest_main.a $@
+
+libgmock.a: libgtest.a
+	@echo -e "    \e[92m[library]\e[0m $@"
+	@ln -sf ../external/googletest/lib/libgmock.a $@
+
