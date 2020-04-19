@@ -11,6 +11,10 @@ namespace executor {
 namespace command {
 
 
+///////////////////////////////////////
+/// Declaration
+///////////////////
+
 class EndCommand : public BaseCommand {
 public:
     EndCommand() = default;
@@ -20,6 +24,18 @@ public:
     Return run(ExecutionContext& ioExecutionContext, const std::vector<common::Argument>& iArguments) const override;
 
 };
+
+///////////////////////////////////////
+/// Definition
+///////////////////
+
+bool EndCommand::isValid(const std::vector<common::Argument>& iArguments) const {
+    return iArguments.empty();
+}
+
+Return EndCommand::run(ExecutionContext& /* ioExecutionContext */, const std::vector<common::Argument>& /* iArguments */) const {
+    return {true};
+}
 
 
 } // namespace command

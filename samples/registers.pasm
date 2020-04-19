@@ -7,6 +7,8 @@ print   S1
 print   "\n"
 print   N1
 print   "\n"
+print   N2
+print   "\n"
 print   I2
 print   "\n"
 end

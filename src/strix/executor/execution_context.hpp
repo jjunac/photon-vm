@@ -12,62 +12,81 @@ namespace strix {
 namespace executor {
 
 
+///////////////////////////////////////
+/// Declaration
+///////////////////
+
 class ExecutionContext final {
 public:
     ExecutionContext() = default;
     ~ExecutionContext() = default;
 
     template <typename T>
-    void setRegisterValue(uint32_t iRegisterNumber, const T& iValue);
+    const T& getRegisterValue(uint32_t iRegisterNumber) const;
+    template <typename T>
+    T& accessRegisterValue(uint32_t iRegisterNumber);
 
-    template <typename U>
-    U evaluate(const common::Argument& iArgument) const;
-    template <typename U>
-    U evaluate(const common::Register& iRegister) const;
+    template <typename U, typename V>
+    U evaluate(const V& iValue) const;
+    template <typename T>
+    T evaluate(const common::Argument& iArgument) const;
+    template <typename T>
+    T evaluate(const common::Register& iRegister) const;
 
 private:
     executor::Memory _memory;
-
 };
 
+///////////////////////////////////////
+/// Definition
+///////////////////
+
 template <typename T>
-void ExecutionContext::setRegisterValue(uint32_t iRegisterNumber, const T& iValue) {
-    _memory.accessValue<T>(iRegisterNumber) = iValue;
+const T& ExecutionContext::getRegisterValue(uint32_t iRegisterNumber) const {
+    return _memory.getValue<T>(iRegisterNumber);
+}
+template <typename T>
+T& ExecutionContext::accessRegisterValue(uint32_t iRegisterNumber) {
+    return _memory.accessValue<T>(iRegisterNumber);
 }
 
-template <typename U>
-inline U ExecutionContext::evaluate(const common::Argument& iValue) const {
+template <typename U, typename V>
+U ExecutionContext::evaluate(const V& iValue) const {
+    return ConversionHelper<U, V>().convert(iValue);
+}
+
+template <typename T>
+T ExecutionContext::evaluate(const common::Argument& iValue) const {
     using common::Type;
     switch(iValue.getType()) {
     case Type::LONG:
-        return ConversionHelper<U, long>().convert(iValue.get<long>());
+        return evaluate<T>(iValue.get<long>());
     case Type::DOUBLE:
-        return ConversionHelper<U, double>().convert(iValue.get<double>());
+        return evaluate<T>(iValue.get<double>());
     case Type::STRING:
-        return ConversionHelper<U, std::string>().convert(iValue.get<std::string>());
+        return evaluate<T>(iValue.get<std::string>());
     case Type::REGISTER:
-        return evaluate<U>(iValue.get<common::Register>());
+        return evaluate<T>(iValue.get<common::Register>());
     default:
         throw exception::BadConversion();
     }
 }
 
-template <typename U>
-inline U ExecutionContext::evaluate(const common::Register& iRegister) const {
+template <typename T>
+T ExecutionContext::evaluate(const common::Register& iRegister) const {
     using common::Type;
     auto aRegisterNumber = iRegister.getRegisterNumber();
     switch(iRegister.getType()) {
     case Type::LONG:
-        return ConversionHelper<U, long>().convert(_memory.getValue<long>(aRegisterNumber));
+        return evaluate<T>(_memory.getValue<long>(aRegisterNumber));
     case Type::DOUBLE:
-        return ConversionHelper<U, double>().convert(_memory.getValue<double>(aRegisterNumber));
+        return evaluate<T>(_memory.getValue<double>(aRegisterNumber));
     case Type::STRING:
-        return ConversionHelper<U, std::string>().convert(_memory.getValue<std::string>(aRegisterNumber));
+        return evaluate<T>(_memory.getValue<std::string>(aRegisterNumber));
     default:
         throw exception::BadConversion();
     }
 }
-
 
 
 } // namespace executor

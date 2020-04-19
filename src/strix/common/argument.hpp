@@ -32,7 +32,9 @@ public:
     bool isDouble() const   { return Type(_value.which()) == Type::DOUBLE; }
     bool isString() const   { return Type(_value.which()) == Type::STRING; }
 
-    bool isRegisterType(Type iType) const { return isRegister() && boost::get<Register>(_value).getType() == iType; }
+    bool isRegisterType(Type iType) const   { return isRegister() && boost::get<Register>(_value).getType() == iType; }
+    bool isNumeric() const                  { return isLong() || isDouble(); }
+    bool isNumericRegister() const          { return isRegister() && boost::get<Register>(_value).isNumericRegister(); }
 
     friend inline bool operator==(const Argument& lhs, const Argument& rhs) {
         return lhs._value == rhs._value;

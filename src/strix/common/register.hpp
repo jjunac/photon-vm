@@ -25,6 +25,8 @@ public:
     bool isDoubleRegister() const       { return _type == Type::DOUBLE; }
     bool isStringRegister() const       { return _type == Type::STRING; }
 
+    bool isNumericRegister() const      { return isLongRegister() || isDoubleRegister(); }
+
     friend inline bool operator==(const Register& lhs, const Register& rhs) {
         return (lhs._type == rhs._type) && (lhs._number == rhs._number);
     }
