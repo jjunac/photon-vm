@@ -28,6 +28,12 @@ void PasmParser::parseExpression(PasmParser::State iStartState, const std::strin
         char c = iStr[i];
 
 reexecute:
+        if (c == '#') {
+            if (aCurrentState != State::kString) {
+                break;
+            }
+        }
+
         switch (aCurrentState) {
 
         case State::kStart:

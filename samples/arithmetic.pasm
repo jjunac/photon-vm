@@ -18,6 +18,7 @@ print   I1
 print   ", "
 print   N1
 print   "\n"
+
 set     I1, 2
 set     I2, 4
 add     I3, I1, I2  # I3 is now 6 (2+4)
@@ -40,4 +41,5 @@ set     N2, 3
 div     N3, N1, N2  # N3 is now 0.333333
 print   N3
 print   "\n"
+
 end

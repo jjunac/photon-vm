@@ -90,6 +90,37 @@ TEST_F(PasmParserTest, shouldParseExpression_WhenTwoRegisters) {
     _parser.parseExpression(PasmParser::State::kStart, "set S2, S1");
 }
 
+TEST_F(PasmParserTest, shouldNotParseExpression_WhenCommented) {
+    _parser.parseExpression(PasmParser::State::kStart, "#set S2, S1");
+}
+
+TEST_F(PasmParserTest, shouldNotParseArgument_WhenCommented) {
+    EXPECT_CALL(_parser, onCommand("add"));
+    EXPECT_CALL(_parser, onArgument({Register{Type::LONG, 1u}}));
+    EXPECT_CALL(_parser, onArgument({3l}));
+    _parser.parseExpression(PasmParser::State::kStart, "add I1, 3 #, 5");
+}
+
+TEST_F(PasmParserTest, shouldNotThrow_WhenCommentAfterExpression) {
+    EXPECT_CALL(_parser, onCommand("print"));
+    EXPECT_CALL(_parser, onArgument({"test"}));
+    _parser.parseExpression(PasmParser::State::kStart, "print \"test\" # This print 'test'");
+}
+
+TEST_F(PasmParserTest, shouldParseString_WhenCommentTokenPresent) {
+    EXPECT_CALL(_parser, onCommand("print"));
+    EXPECT_CALL(_parser, onArgument({"#Test"}));
+    _parser.parseExpression(PasmParser::State::kStart, "print \"#Test\"");
+}
+
+TEST_F(PasmParserTest, shouldNotThrow_WhenBlankLine) {
+    _parser.parseExpression(PasmParser::State::kStart, "");
+}
+
+TEST_F(PasmParserTest, shouldNotThrow_WhenBlankLineWithSpace) {
+    _parser.parseExpression(PasmParser::State::kStart, " ");
+}
+
 
 
 }  // namespace parser

@@ -34,7 +34,7 @@ public:
 
     const std::vector<common::Expression>& getExpressions() const { return _expressions; }
 
-    const common::Expression& parseLine(const std::string& iLine);
+    void parseLine(const std::string& iLine);
 
     //Callbacks
     void onCommand(std::string iCommand) override;
