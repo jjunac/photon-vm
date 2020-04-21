@@ -16,7 +16,7 @@ SRCDIR := src
 HEADERDIR := include
 TESTDIR := test
 BUILDDIR := build
-TARGET := bin/strix
+TARGET := bin/photon
 TEST_TARGET := bin/test
 
 # Filename (without the extension) of the file contaning the main function
@@ -85,6 +85,7 @@ all: build
 build: external $(TARGET)
 
 $(TARGET): $(OBJECTS)
+	@mkdir -p $(@D)
 	@echo -e "    \e[93m[artefact]\e[0m $@"
 	@$(CXX) $(LDFLAGS) $^ -o $@ $(LDLIBS)
 

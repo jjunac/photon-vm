@@ -1,7 +1,7 @@
 #!/bin/bash
 
 TESTDIR="samples"
-BINARY=bin/strix
+BINARY=bin/photon
 
 in_files="$TESTDIR/*.pasm"
 nb_files=$(ls -l $in_files | wc -l)

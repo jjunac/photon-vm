@@ -2,7 +2,7 @@
 all: libgtest.a libgtest_main.a libgmock.a
 
 libgtest.a:
-	@cmake ../external/googletest/
+	@cd ../external/googletest/ && cmake .
 	@$(MAKE) -s --no-print-directory  -C ../external/googletest/
 	@echo -e "    \e[92m[library]\e[0m $@"
 	@ln -sf ../external/googletest/lib/libgtest.a $@
